@@ -33,7 +33,7 @@ _SCALES = {"hundred": 100}
 
 _KEYWORDS = {
     "today", "now", "tomorrow", "yesterday", "next", "last", "ago", "in", "from", "and",
-    "christmas", "easter", "new", "before", "after",
+    "christmas", "easter", "new", "before", "after", "eve",
 }
 
 _HOLIDAY_KINDS = {"christmas": "christmas", "easter": "easter"}
@@ -45,7 +45,7 @@ class ParseError(Exception):
 
 @dataclass(frozen=True)
 class RelativeExpr:
-    kind: str  # today | tomorrow | yesterday | next_weekday | last_weekday | offset | compound_offset | weekday_in_offset | christmas | easter | new_year | anchored_offset
+    kind: str  # today | tomorrow | yesterday | next_weekday | last_weekday | offset | compound_offset | weekday_in_offset | christmas | christmas_eve | christmas_day | easter | new_year | anchored_offset
     weekday: int | None = None
     amount: int | None = None
     unit: str | None = None
@@ -167,6 +167,13 @@ def parse_relative(text: str) -> RelativeExpr:
         return RelativeExpr("tomorrow")
     if tokens == ["yesterday"]:
         return RelativeExpr("yesterday")
+
+    if tokens[0] == "christmas" and len(tokens) >= 2 and tokens[1] in ("eve", "day"):
+        kind = "christmas_eve" if tokens[1] == "eve" else "christmas_day"
+        year = _parse_optional_year(tokens[2:])
+        if year is None and len(tokens) > 2:
+            raise _unrecognized_error(text, tokens)
+        return RelativeExpr(kind, year=year)
 
     if tokens[0] in _HOLIDAY_KINDS:
         year = _parse_optional_year(tokens[1:])

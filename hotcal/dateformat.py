@@ -46,6 +46,19 @@ def _detect_order_and_separator() -> tuple[str, str]:
 _ORDER, _SEPARATOR = _detect_order_and_separator()
 
 
+def country_code() -> str | None:
+    """The system locale's ISO 3166-1 country code (e.g. "DE" for de_DE), or
+    None if it can't be determined."""
+    try:
+        locale.setlocale(locale.LC_ALL, "")
+        name, _ = locale.getlocale()
+    except (locale.Error, AttributeError, ValueError):
+        return None
+    if not name or "_" not in name:
+        return None
+    return name.split("_", 1)[1].split(".", 1)[0].upper() or None
+
+
 def _ordinal_suffix(n: int) -> str:
     if 10 <= n % 100 <= 20:
         return "th"

@@ -87,11 +87,11 @@ def resolve(expr: RelativeExpr, today: tuple[int, int, int]) -> tuple[int, int, 
         shifted = engine.add_offset(year, month, day, expr.amount, expr.unit)
         return engine.weekday_of_week(*shifted, expr.weekday)
     if expr.kind == "christmas":
-        # Deliberately Dec 24 (Heiligabend), not Dec 25 — matches the
-        # convention actually observed where this project is developed.
-        # A locale/country-aware distinction (vs. a separate "christmas eve"
-        # word) is still an open question — don't "fix" this without asking.
+        return _resolve_fixed_holiday(today, expr.year, month=12, day=_locale_christmas_day())
+    if expr.kind == "christmas_eve":
         return _resolve_fixed_holiday(today, expr.year, month=12, day=24)
+    if expr.kind == "christmas_day":
+        return _resolve_fixed_holiday(today, expr.year, month=12, day=25)
     if expr.kind == "new_year":
         return _resolve_fixed_holiday(today, expr.year, month=1, day=1)
     if expr.kind == "easter":
@@ -103,6 +103,29 @@ def resolve(expr: RelativeExpr, today: tuple[int, int, int]) -> tuple[int, int, 
         return (y, m, d)
 
     raise AssertionError(f"unhandled expression kind {expr.kind!r}")
+
+
+# Countries where the main Christmas celebration is Dec 24 (Christmas Eve),
+# not Dec 25. Unlike the rest of this engine, this list has no authoritative
+# source — it's an approximation, scoped for now to Western/Christian-
+# tradition countries (Europe + the Americas) with a well-established single
+# convention. Genuinely mixed cases (e.g. much of Latin America) are left out
+# rather than guessed at; they fall through to the Dec 25 default below.
+_CHRISTMAS_EVE_COUNTRIES = frozenset({
+    "DE", "AT", "CH", "LI",  # German-speaking
+    "PL", "CZ", "SK", "HU", "SI",  # Central Europe
+    "NO", "SE", "DK", "FI", "IS",  # Nordics
+    "EE", "LV", "LT",  # Baltics
+})
+
+
+def _locale_christmas_day() -> int:
+    """24 or 25, based on the system locale's country. Defaults to 25 if the
+    locale is undetected or not in the table above."""
+    country = dateformat.country_code()
+    if country in _CHRISTMAS_EVE_COUNTRIES:
+        return 24
+    return 25
 
 
 def _resolve_fixed_holiday(

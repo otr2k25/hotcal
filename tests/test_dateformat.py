@@ -63,3 +63,31 @@ def test_parse_numeric_date_rejects_invalid_day_matches_spec_example():
 
 def test_format_date_matches_detected_order():
     assert dateformat.format_date(2036, 5, 22) == "22.05.2036"
+
+
+@pytest.mark.parametrize(
+    "locale_name, expected",
+    [
+        ("de_DE", "DE"),
+        ("en_US", "US"),
+        ("fr_FR.UTF-8", "FR"),
+        ("C", None),  # no country component
+        (None, None),  # locale.getlocale() returned nothing
+    ],
+)
+def test_country_code_from_various_locales(monkeypatch, locale_name, expected):
+    monkeypatch.setattr(locale, "setlocale", lambda *a, **kw: None)
+    monkeypatch.setattr(locale, "getlocale", lambda *a, **kw: (locale_name, "UTF-8") if locale_name else (None, None))
+    assert dateformat.country_code() == expected
+
+
+def test_country_code_falls_back_when_unavailable(monkeypatch):
+    def raise_error(*a, **kw):
+        raise locale.Error("no locale")
+
+    monkeypatch.setattr(locale, "setlocale", raise_error)
+    assert dateformat.country_code() is None
+
+
+def test_this_sandboxs_actual_country_code_is_detected_correctly():
+    assert dateformat.country_code() == "DE"

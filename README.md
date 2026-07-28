@@ -141,13 +141,19 @@ Holidays — resolve to the nearest upcoming occurrence unless a year is given:
 
 ```
 christmas              christmas 2030
+christmas eve           christmas eve 2030
+christmas day           christmas day 2030
 easter                 easter 2028
 new year               new year 2030
 ```
 
-(`christmas` is December 24 — Heiligabend — not December 25. This is a
-deliberate choice, not a bug; a locale-aware or `christmas eve`-as-a-separate-
-word approach is still under consideration.)
+`christmas eve` is always December 24, `christmas day` is always December
+25. Bare `christmas` picks between them based on the system locale's
+country — Dec 24 for a set of Western/Christian-tradition countries where
+Christmas Eve is the main celebration (Germany, Austria, Switzerland,
+Poland, the Nordics, the Baltics, ...), Dec 25 everywhere else, including
+when the locale can't be determined. This list has no authoritative source
+and isn't exhaustive — see `hotcal/query.py`'s `_CHRISTMAS_EVE_COUNTRIES`.
 
 Offsets anchored to another expression, with `before`/`after` — the anchor
 can be anything else in this vocabulary: today, another holiday, a weekday,

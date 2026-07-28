@@ -9,6 +9,10 @@ from hotcal.parser import ParseError, RelativeExpr, parse_relative
         ("christmas", RelativeExpr("christmas")),
         ("Christmas", RelativeExpr("christmas")),
         ("christmas 2030", RelativeExpr("christmas", year=2030)),
+        ("christmas eve", RelativeExpr("christmas_eve")),
+        ("christmas eve 2030", RelativeExpr("christmas_eve", year=2030)),
+        ("christmas day", RelativeExpr("christmas_day")),
+        ("christmas day 2030", RelativeExpr("christmas_day", year=2030)),
         ("easter", RelativeExpr("easter")),
         ("easter 2028", RelativeExpr("easter", year=2028)),
         ("new year", RelativeExpr("new_year")),
@@ -32,3 +36,13 @@ def test_new_without_year_errors():
 def test_new_year_with_garbage_trailing_word_errors():
     with pytest.raises(ParseError):
         parse_relative("new year soonish")
+
+
+def test_christmas_eve_with_garbage_year_errors():
+    with pytest.raises(ParseError):
+        parse_relative("christmas eve soon")
+
+
+def test_christmas_day_with_garbage_year_errors():
+    with pytest.raises(ParseError):
+        parse_relative("christmas day soon")

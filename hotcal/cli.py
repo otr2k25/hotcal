@@ -30,7 +30,10 @@ Relative expressions:
   <n> <unit> from now
   <n> <unit> [and <n> <unit>]... before|after <expression>
   <weekday> in <n> <unit>               (e.g. "monday in three weeks")
-  christmas [<year>], easter [<year>], new year [<year>]
+  christmas [<year>]       (Dec 24 or 25, per system locale)
+  christmas eve [<year>]   (always Dec 24)
+  christmas day [<year>]   (always Dec 25)
+  easter [<year>], new year [<year>]
 
 Calculation expressions (require an explicit month):
   last day of month [in|of <month> [<year>]]
