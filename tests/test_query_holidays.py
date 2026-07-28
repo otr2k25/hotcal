@@ -7,13 +7,14 @@ from hotcal.parser import parse_relative
 @pytest.mark.parametrize(
     "today, text, expected",
     [
+        # Christmas is Dec 24 (Heiligabend) here, not Dec 25 — deliberate.
         # Christmas hasn't happened yet this year -> this year's Christmas.
-        ((2026, 7, 27), "christmas", (2026, 12, 25)),
+        ((2026, 7, 27), "christmas", (2026, 12, 24)),
         # Christmas already passed this year -> next year's.
-        ((2026, 12, 26), "christmas", (2027, 12, 25)),
+        ((2026, 12, 25), "christmas", (2027, 12, 24)),
         # Exactly on Christmas -> today.
-        ((2026, 12, 25), "christmas", (2026, 12, 25)),
-        ((2026, 7, 27), "christmas 2030", (2030, 12, 25)),
+        ((2026, 12, 24), "christmas", (2026, 12, 24)),
+        ((2026, 7, 27), "christmas 2030", (2030, 12, 24)),
         # New Year's Day of this year has (almost) always already passed.
         ((2026, 7, 27), "new year", (2027, 1, 1)),
         ((2026, 1, 1), "new year", (2026, 1, 1)),

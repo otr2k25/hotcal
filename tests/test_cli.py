@@ -83,7 +83,7 @@ def test_date_is_no_longer_a_special_verb(monkeypatch, capsys):
 def test_holiday_expressions_via_cli(monkeypatch, capsys):
     _freeze(monkeypatch, 2026, 7, 27)
     assert cli.main(["-n", "christmas"]) == 0
-    assert capsys.readouterr().out.strip() == "25.12.2026"
+    assert capsys.readouterr().out.strip() == "24.12.2026"
 
     assert cli.main(["-n", "easter"]) == 0
     assert capsys.readouterr().out.strip() == "28.03.2027"
@@ -92,13 +92,13 @@ def test_holiday_expressions_via_cli(monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "01.01.2027"
 
     assert cli.main(["-n", "christmas", "2030"]) == 0
-    assert capsys.readouterr().out.strip() == "25.12.2030"
+    assert capsys.readouterr().out.strip() == "24.12.2030"
 
 
 def test_before_after_expressions_via_cli(monkeypatch, capsys):
     _freeze(monkeypatch, 2026, 7, 28)
     assert cli.main(["-n", "3", "days", "before", "christmas"]) == 0
-    assert capsys.readouterr().out.strip() == "22.12.2026"
+    assert capsys.readouterr().out.strip() == "21.12.2026"
 
     assert cli.main(["-n", "2", "weeks", "after", "easter"]) == 0
     assert capsys.readouterr().out.strip() == "11.04.2027"
@@ -114,4 +114,4 @@ def test_before_after_month_view_highlights_resolved_date(monkeypatch, capsys):
     _freeze(monkeypatch, 2026, 7, 28)
     assert cli.main(["3", "days", "before", "christmas"]) == 0
     out = capsys.readouterr().out
-    assert out.rstrip("\n") == render.render_month(2026, 12, highlight_day=22, color=False)
+    assert out.rstrip("\n") == render.render_month(2026, 12, highlight_day=21, color=False)

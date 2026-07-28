@@ -145,6 +145,10 @@ easter                 easter 2028
 new year               new year 2030
 ```
 
+(`christmas` is December 24 — Heiligabend — not December 25. This is a
+deliberate choice, not a bug; a locale-aware or `christmas eve`-as-a-separate-
+word approach is still under consideration.)
+
 Offsets anchored to another expression, with `before`/`after` — the anchor
 can be anything else in this vocabulary: today, another holiday, a weekday,
 a literal date, or even a Calculation-category expression:
@@ -229,7 +233,7 @@ Mo Tu We Th Fr Sa Su
 
 ```
 $ hotcal -n christmas 2030
-25.12.2030
+24.12.2030
 
 $ hotcal -n easter 2028
 16.04.2028
@@ -241,7 +245,7 @@ $ hotcal -n in two days and 4 weeks
 27.08.2026
 
 $ hotcal -n 3 days before christmas
-22.12.2026
+21.12.2026
 ```
 
 Errors are single-line diagnostics on stderr, exit code 1:

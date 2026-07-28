@@ -87,7 +87,11 @@ def resolve(expr: RelativeExpr, today: tuple[int, int, int]) -> tuple[int, int, 
         shifted = engine.add_offset(year, month, day, expr.amount, expr.unit)
         return engine.weekday_of_week(*shifted, expr.weekday)
     if expr.kind == "christmas":
-        return _resolve_fixed_holiday(today, expr.year, month=12, day=25)
+        # Deliberately Dec 24 (Heiligabend), not Dec 25 — matches the
+        # convention actually observed where this project is developed.
+        # A locale/country-aware distinction (vs. a separate "christmas eve"
+        # word) is still an open question — don't "fix" this without asking.
+        return _resolve_fixed_holiday(today, expr.year, month=12, day=24)
     if expr.kind == "new_year":
         return _resolve_fixed_holiday(today, expr.year, month=1, day=1)
     if expr.kind == "easter":
