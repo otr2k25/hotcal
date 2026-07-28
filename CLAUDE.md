@@ -325,8 +325,6 @@ To keep the grammar unambiguous, vocabulary is grouped into two categories. An e
 
 Mixing categories (e.g. `next fourth thursday in may`) is invalid and produces a diagnostic.
 
-## Calendar arithmetic
-* **Calendar arithmetic** — expressions like `today + 3 weeks`, `today - 8 months`, `next monday + 2 days`,`-1 day`,`-2 weeks`,`-3 months`,`01.01.2025 +1 day`,`01.01.2025 +2 weeks`,`01.01.2025 +3 months`,`+1 day +1 week`
 
 
 ## Error Handling
@@ -463,9 +461,11 @@ The interface should prefer readable language over flags whenever this does not 
 
 # Future Features
 
+Discuss only when asked.
 Not part of the first release. Planned for a later version:
 * **ISO week calculations** — week number, first/last day of an ISO week, ISO week expressions in the parser.
-
+* **Calendar arithmetic** — expressions like `today + 3 weeks`, `today - 8 months`, `next monday + 2 days`,`-1 day`,`-2 weeks`,`-3 months`,`01.01.2025 +1 day`,`01.01.2025 +2 weeks`,`01.01.2025 +3 months`,`+1 day +1 week`
+* **Day of month in natural language and ordinals** -- expressions like `third of march`, `22nd august 1932`,`15 january 2067`,`first of may`
 ---
 
 # Success Criteria
