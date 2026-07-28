@@ -202,13 +202,19 @@ day of year today
 
 ### Numeric date literals
 
-Any of the three supported formats, standalone, per your system locale
-(day-first here, since this system is `de_DE`):
+All three formats parse regardless of locale — `YYYY-MM-DD` is always
+recognized via its leading 4-digit year, and for the other two, whichever
+format actually produces a valid date wins (day-first is preferred for
+genuinely ambiguous input like `07/04`, since this system's locale is
+`de_DE`; the *other* order is still accepted when only it is valid, e.g. a
+day > 12). If the locale can't be determined at all, display and the
+ambiguous-input tiebreak both default to ISO 8601 (`YYYY-MM-DD`).
 
 ```
-31.12.2564
-27/07/2026
-2026-07-27
+31.12.2564       (unambiguously day-first: no valid month is 31)
+27/07/2026       (ambiguous; day-first locale preference wins)
+12.25.2026       (only valid as month-first -> Dec 25, despite the locale)
+2026-07-27       (always ISO, any locale)
 ```
 
 ## Examples

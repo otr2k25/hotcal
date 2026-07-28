@@ -308,7 +308,14 @@ The following numeric date formats are supported:
 * Month-Day-Year (MM/DD/YYYY)
 * Year-Month-Day (YYYY-MM-DD)
 
-The format used for parsing and display is determined by the system locale.
+The format used for **display** is determined by the system locale, and
+defaults to YYYY-MM-DD if the locale can't be determined.
+
+For **parsing**, all three formats are accepted regardless of locale: a
+leading 4-digit group is always YYYY-MM-DD; otherwise the locale's own
+DD/MM vs. MM/DD preference is used to resolve genuinely ambiguous input
+(e.g. `07/04/2026`), but a value that's only valid under the *other* order
+(e.g. `12/25/2026` under a DD/MM-preferring locale) still parses correctly.
 
 ## Command Language
 
