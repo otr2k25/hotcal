@@ -1,0 +1,65 @@
+import locale
+
+import pytest
+
+from hotcal import dateformat
+
+
+@pytest.mark.parametrize(
+    "d_fmt, expected_order, expected_sep",
+    [
+        ("%d.%m.%Y", "dmy", "."),   # de_DE
+        ("%m/%d/%Y", "mdy", "/"),   # en_US
+        ("%Y-%m-%d", "ymd", "-"),   # many ISO-preferring locales
+        ("%d/%m/%y", "dmy", "/"),
+    ],
+)
+def test_detect_order_and_separator_from_various_locales(monkeypatch, d_fmt, expected_order, expected_sep):
+    monkeypatch.setattr(locale, "nl_langinfo", lambda _: d_fmt, raising=False)
+    monkeypatch.setattr(locale, "setlocale", lambda *a, **kw: None)
+    assert dateformat._detect_order_and_separator() == (expected_order, expected_sep)
+
+
+def test_detect_order_and_separator_falls_back_when_unavailable(monkeypatch):
+    def raise_error(*a, **kw):
+        raise locale.Error("no locale")
+
+    monkeypatch.setattr(locale, "setlocale", raise_error)
+    assert dateformat._detect_order_and_separator() == ("dmy", ".")
+
+
+def test_this_sandboxs_actual_locale_is_detected_correctly():
+    # Smoke test against the real ambient locale (de_DE in this environment).
+    order, sep = dateformat._detect_order_and_separator()
+    assert (order, sep) == ("dmy", ".")
+
+
+def test_parse_numeric_date_dmy():
+    assert dateformat.parse_numeric_date("31.12.2564") == (2564, 12, 31)
+
+
+def test_parse_numeric_date_iso_always_year_first():
+    assert dateformat.parse_numeric_date("2026-07-27") == (2026, 7, 27)
+
+
+def test_parse_numeric_date_accepts_slash_separator_too():
+    assert dateformat.parse_numeric_date("27/07/2026") == (2026, 7, 27)
+
+
+def test_parse_numeric_date_returns_none_for_non_date_shapes():
+    assert dateformat.parse_numeric_date("hello") is None
+    assert dateformat.parse_numeric_date("today") is None
+
+
+def test_parse_numeric_date_rejects_invalid_month():
+    with pytest.raises(ValueError, match="month 13 does not exist"):
+        dateformat.parse_numeric_date("01.13.2026")
+
+
+def test_parse_numeric_date_rejects_invalid_day_matches_spec_example():
+    with pytest.raises(ValueError, match=r'February 2026 has no 31st day'):
+        dateformat.parse_numeric_date("31/02/2026")
+
+
+def test_format_date_matches_detected_order():
+    assert dateformat.format_date(2036, 5, 22) == "22.05.2036"
