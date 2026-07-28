@@ -52,6 +52,7 @@ class RelativeExpr:
     terms: tuple[tuple[int, str], ...] | None = None  # for compound_offset/anchored_offset: [(signed_amount, unit), ...]
     year: int | None = None  # explicit year for holiday expressions, e.g. "christmas 2030"
     anchor_text: str | None = None  # for anchored_offset: the un-parsed anchor expression, e.g. "christmas"
+    year_offset_text: str | None = None  # for holidays: which year, e.g. "in ten years" in "christmas in ten years"
 
 
 def _is_known_word(word: str) -> bool:
@@ -140,13 +141,21 @@ def _make_offset_expr(terms: list[tuple[int, str]], sign: int) -> RelativeExpr:
     return RelativeExpr("compound_offset", terms=tuple(signed))
 
 
-def _parse_optional_year(tokens: list[str]) -> int | None:
-    """A trailing bare year, e.g. the "2030" in "christmas 2030". None if absent."""
-    if not tokens:
-        return None
-    if len(tokens) == 1 and tokens[0].isdigit():
-        return int(tokens[0])
-    return None
+def _parse_holiday_year_suffix(text: str, tokens: list[str], rest: list[str]) -> tuple[int | None, str | None]:
+    """What follows a holiday keyword: nothing, a literal year ("christmas
+    2030"), or a Relative expression describing which year to shift to
+    ("christmas in ten years"). Returns (literal_year, year_offset_text) —
+    at most one of the two is set.
+    """
+    if not rest:
+        return None, None
+    if len(rest) == 1 and rest[0].isdigit():
+        return int(rest[0]), None
+    try:
+        parse_relative(" ".join(rest))
+    except ParseError:
+        raise _unrecognized_error(text, tokens) from None
+    return None, " ".join(rest)
 
 
 def _unrecognized_error(text: str, tokens: list[str]) -> ParseError:
@@ -170,22 +179,16 @@ def parse_relative(text: str) -> RelativeExpr:
 
     if tokens[0] == "christmas" and len(tokens) >= 2 and tokens[1] in ("eve", "day"):
         kind = "christmas_eve" if tokens[1] == "eve" else "christmas_day"
-        year = _parse_optional_year(tokens[2:])
-        if year is None and len(tokens) > 2:
-            raise _unrecognized_error(text, tokens)
-        return RelativeExpr(kind, year=year)
+        year, year_offset_text = _parse_holiday_year_suffix(text, tokens, tokens[2:])
+        return RelativeExpr(kind, year=year, year_offset_text=year_offset_text)
 
     if tokens[0] in _HOLIDAY_KINDS:
-        year = _parse_optional_year(tokens[1:])
-        if year is None and len(tokens) > 1:
-            raise _unrecognized_error(text, tokens)
-        return RelativeExpr(_HOLIDAY_KINDS[tokens[0]], year=year)
+        year, year_offset_text = _parse_holiday_year_suffix(text, tokens, tokens[1:])
+        return RelativeExpr(_HOLIDAY_KINDS[tokens[0]], year=year, year_offset_text=year_offset_text)
 
     if tokens[0] == "new" and len(tokens) >= 2 and tokens[1] == "year":
-        year = _parse_optional_year(tokens[2:])
-        if year is None and len(tokens) > 2:
-            raise _unrecognized_error(text, tokens)
-        return RelativeExpr("new_year", year=year)
+        year, year_offset_text = _parse_holiday_year_suffix(text, tokens, tokens[2:])
+        return RelativeExpr("new_year", year=year, year_offset_text=year_offset_text)
 
     if len(tokens) == 2 and tokens[0] == "next" and tokens[1] in WEEKDAYS:
         return RelativeExpr("next_weekday", weekday=WEEKDAYS[tokens[1]])

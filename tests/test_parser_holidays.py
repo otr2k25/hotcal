@@ -17,6 +17,12 @@ from hotcal.parser import ParseError, RelativeExpr, parse_relative
         ("easter 2028", RelativeExpr("easter", year=2028)),
         ("new year", RelativeExpr("new_year")),
         ("new year 2030", RelativeExpr("new_year", year=2030)),
+        ("christmas in ten years", RelativeExpr("christmas", year_offset_text="in ten years")),
+        ("christmas eve in ten years", RelativeExpr("christmas_eve", year_offset_text="in ten years")),
+        ("christmas day in ten years", RelativeExpr("christmas_day", year_offset_text="in ten years")),
+        ("easter in three years", RelativeExpr("easter", year_offset_text="in three years")),
+        ("new year in five years", RelativeExpr("new_year", year_offset_text="in five years")),
+        ("christmas eve 3 years ago", RelativeExpr("christmas_eve", year_offset_text="3 years ago")),
     ],
 )
 def test_holiday_parsing(text, expected):

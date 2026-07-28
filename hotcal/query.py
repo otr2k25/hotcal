@@ -87,15 +87,17 @@ def resolve(expr: RelativeExpr, today: tuple[int, int, int]) -> tuple[int, int, 
         shifted = engine.add_offset(year, month, day, expr.amount, expr.unit)
         return engine.weekday_of_week(*shifted, expr.weekday)
     if expr.kind == "christmas":
-        return _resolve_fixed_holiday(today, expr.year, month=12, day=_locale_christmas_day())
+        return _resolve_fixed_holiday(
+            today, expr.year, expr.year_offset_text, month=12, day=_locale_christmas_day()
+        )
     if expr.kind == "christmas_eve":
-        return _resolve_fixed_holiday(today, expr.year, month=12, day=24)
+        return _resolve_fixed_holiday(today, expr.year, expr.year_offset_text, month=12, day=24)
     if expr.kind == "christmas_day":
-        return _resolve_fixed_holiday(today, expr.year, month=12, day=25)
+        return _resolve_fixed_holiday(today, expr.year, expr.year_offset_text, month=12, day=25)
     if expr.kind == "new_year":
-        return _resolve_fixed_holiday(today, expr.year, month=1, day=1)
+        return _resolve_fixed_holiday(today, expr.year, expr.year_offset_text, month=1, day=1)
     if expr.kind == "easter":
-        return _resolve_easter(today, expr.year)
+        return _resolve_easter(today, expr.year, expr.year_offset_text)
     if expr.kind == "anchored_offset":
         y, m, d = resolve_text(expr.anchor_text, today)
         for amount, unit in expr.terms:
@@ -129,19 +131,31 @@ def _locale_christmas_day() -> int:
 
 
 def _resolve_fixed_holiday(
-    today: tuple[int, int, int], explicit_year: int | None, month: int, day: int
+    today: tuple[int, int, int],
+    explicit_year: int | None,
+    year_offset_text: str | None,
+    month: int,
+    day: int,
 ) -> tuple[int, int, int]:
     if explicit_year is not None:
         return (explicit_year, month, day)
+    if year_offset_text is not None:
+        shifted_year, _, _ = resolve_text(year_offset_text, today)
+        return (shifted_year, month, day)
     candidate = (today[0], month, day)
     if candidate < today:
         candidate = (today[0] + 1, month, day)
     return candidate
 
 
-def _resolve_easter(today: tuple[int, int, int], explicit_year: int | None) -> tuple[int, int, int]:
+def _resolve_easter(
+    today: tuple[int, int, int], explicit_year: int | None, year_offset_text: str | None
+) -> tuple[int, int, int]:
     if explicit_year is not None:
         return engine.easter(explicit_year)
+    if year_offset_text is not None:
+        shifted_year, _, _ = resolve_text(year_offset_text, today)
+        return engine.easter(shifted_year)
     candidate = engine.easter(today[0])
     if candidate < today:
         candidate = engine.easter(today[0] + 1)

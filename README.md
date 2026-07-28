@@ -155,6 +155,16 @@ Poland, the Nordics, the Baltics, ...), Dec 25 everywhere else, including
 when the locale can't be determined. This list has no authoritative source
 and isn't exhaustive — see `hotcal/query.py`'s `_CHRISTMAS_EVE_COUNTRIES`.
 
+The year for any holiday can also be given as a Relative expression instead
+of a literal number — the holiday resolves in whichever year that
+expression lands on:
+
+```
+christmas eve in ten years
+easter in three years
+new year 3 years ago
+```
+
 Offsets anchored to another expression, with `before`/`after` — the anchor
 can be anything else in this vocabulary: today, another holiday, a weekday,
 a literal date, or even a Calculation-category expression:

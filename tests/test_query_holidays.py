@@ -61,3 +61,21 @@ def test_resolve_bare_christmas_depends_on_locale(monkeypatch, country, today, e
     monkeypatch.setattr(query.dateformat, "country_code", lambda: country)
     expr = parse_relative("christmas")
     assert query.resolve(expr, today) == expected
+
+
+TODAY_2026 = (2026, 7, 28)
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("christmas eve in ten years", (2036, 12, 24)),
+        ("christmas day in ten years", (2036, 12, 25)),
+        ("easter in three years", (2029, 4, 1)),
+        ("new year in five years", (2031, 1, 1)),
+        ("christmas eve 3 years ago", (2023, 12, 24)),
+    ],
+)
+def test_resolve_holiday_with_year_offset(text, expected):
+    expr = parse_relative(text)
+    assert query.resolve(expr, TODAY_2026) == expected

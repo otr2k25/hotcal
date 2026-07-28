@@ -100,6 +100,9 @@ def test_holiday_expressions_via_cli(monkeypatch, capsys):
     assert cli.main(["-n", "christmas", "day"]) == 0
     assert capsys.readouterr().out.strip() == "25.12.2026"
 
+    assert cli.main(["-n", "christmas", "eve", "in", "ten", "years"]) == 0
+    assert capsys.readouterr().out.strip() == "24.12.2036"
+
 
 def test_before_after_expressions_via_cli(monkeypatch, capsys):
     _freeze(monkeypatch, 2026, 7, 28)
