@@ -42,6 +42,9 @@ Calculation expressions (require an explicit month):
   weekday <date>
   day of year <date>
 
+Day-of-month expressions (require an explicit month):
+  <day> [in|of] <month> [<year>]   (e.g. "third of march", "22nd august 1932", "15 january 2067")
+
 Numeric date literals (order/separator per system locale):
   DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD   (e.g. 31.12.2564, 27/07/2026, 2026-07-27)
 
@@ -57,6 +60,7 @@ Examples:
   hotcal -n fourth thursday in may 2036
   hotcal 3 days before christmas
   hotcal weekday 31.12.2564
+  hotcal -n 22nd august 1932
 """
 
 

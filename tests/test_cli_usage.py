@@ -25,7 +25,8 @@ def test_usage_mentions_key_grammar_pieces(capsys):
     cli.main(["--help"])
     out = capsys.readouterr().out
     for fragment in ["-n", "ago", "before", "after", "christmas", "easter", "new year",
-                      "last day of month", "weekday <date>", "day of year"]:
+                      "last day of month", "weekday <date>", "day of year",
+                      "Day-of-month expressions"]:
         assert fragment in out
 
 

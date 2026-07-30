@@ -56,3 +56,24 @@ def test_nonexistent_nth_weekday_errors(monkeypatch, capsys):
         'Error: "fifth monday in february 2026" does not exist — '
         "February 2026 has only 4 Mondays"
     )
+
+
+def test_n_flag_prints_day_of_month_result_as_date_string(monkeypatch, capsys):
+    _freeze(monkeypatch, 2026, 7, 27)
+    assert cli.main(["-n", "22nd", "august", "1932"]) == 0
+    out = capsys.readouterr().out
+    assert out.strip() == "22.08.1932"
+
+
+def test_day_of_month_without_year_highlights_current_year(monkeypatch, capsys):
+    _freeze(monkeypatch, 2026, 7, 27)
+    assert cli.main(["third", "of", "march"]) == 0
+    out = capsys.readouterr().out
+    assert out.rstrip("\n") == render.render_month(2026, 3, highlight_day=3, color=False)
+
+
+def test_invalid_day_of_month_errors(monkeypatch, capsys):
+    _freeze(monkeypatch, 2026, 7, 27)
+    assert cli.main(["31st", "of", "february", "2026"]) == 1
+    err = capsys.readouterr().err
+    assert err.strip() == 'Error: invalid date "31st of february 2026" — February 2026 has no 31st day'

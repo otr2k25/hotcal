@@ -67,7 +67,7 @@ def _is_known_word(word: str) -> bool:
     )
 
 
-def _parse_number(tokens: list[str], start: int) -> tuple[int, int] | None:
+def parse_number(tokens: list[str], start: int) -> tuple[int, int] | None:
     """Parse a run of number words/digits starting at `start`.
 
     Returns (value, next_index) or None if tokens[start] isn't a number.
@@ -103,7 +103,7 @@ def _parse_number(tokens: list[str], start: int) -> tuple[int, int] | None:
 
 def _parse_amount_unit(tokens: list[str]) -> tuple[int, str] | None:
     """Parse a full "<number> <unit>" phrase spanning all of `tokens`."""
-    parsed = _parse_number(tokens, 0)
+    parsed = parse_number(tokens, 0)
     if parsed is None:
         return None
     amount, idx = parsed

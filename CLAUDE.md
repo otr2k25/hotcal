@@ -284,6 +284,14 @@ Determine day number (shown as highlighted date in month view).
 → month view of the current month, with today highlighted
 ```
 
+Determine date from a day-of-month expression.
+
+```
+ -n 22nd august 1932
+
+22/08/1932
+```
+
 ---
 
 # Parser
@@ -299,6 +307,7 @@ The parser should recognize:
 * ordinal numbers
 * written numbers
 * numeric dates
+* day of month, written in natural language (e.g. `third of march`, `22nd august 1932`, `15 january 2067`)
 
 ## Date Formats
 
@@ -328,7 +337,7 @@ The natural language grammar uses a fixed, closed vocabulary of temporally meani
 To keep the grammar unambiguous, vocabulary is grouped into two categories. An expression belongs to exactly one category — words from different categories cannot be combined within the same expression.
 
 * **Relative** — today, tomorrow, yesterday, next, last, ago, in \<n\> \<unit\>, from now (e.g. `next monday`, `in three weeks`, `two days ago`, `monday in three weeks`)
-* **Calculation** — last day of, first weekday of, nth weekday of, remaining days, leap year, number of weeks, day of year (e.g. `fourth thursday in may`, `last day of month`)
+* **Calculation** — last day of, first weekday of, nth weekday of, remaining days, leap year, number of weeks, day of year, day-of-month literals (e.g. `fourth thursday in may`, `last day of month`, `third of march`, `22nd august 1932`)
 
 Mixing categories (e.g. `next fourth thursday in may`) is invalid and produces a diagnostic.
 
@@ -472,7 +481,6 @@ Discuss only when asked.
 Not part of the first release. Planned for a later version:
 * **ISO week calculations** — week number, first/last day of an ISO week, ISO week expressions in the parser.
 * **Calendar arithmetic** — expressions like `today + 3 weeks`, `today - 8 months`, `next monday + 2 days`,`-1 day`,`-2 weeks`,`-3 months`,`01.01.2025 +1 day`,`01.01.2025 +2 weeks`,`01.01.2025 +3 months`,`+1 day +1 week`
-* **Day of month in natural language and ordinals** -- expressions like `third of march`, `22nd august 1932`,`15 january 2067`,`first of may`
 ---
 
 # Success Criteria

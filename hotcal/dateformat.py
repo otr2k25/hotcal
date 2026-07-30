@@ -73,25 +73,25 @@ def country_code() -> str | None:
     return name.split("_", 1)[1].split(".", 1)[0].upper() or None
 
 
-def _ordinal_suffix(n: int) -> str:
+def ordinal_suffix(n: int) -> str:
     if 10 <= n % 100 <= 20:
         return "th"
     return {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
 
 
-def _is_valid_date(year: int, month: int, day: int) -> bool:
+def is_valid_date(year: int, month: int, day: int) -> bool:
     if not 1 <= month <= 12:
         return False
     return 1 <= day <= engine.days_in_month(year, month)
 
 
-def _invalid_date_error(token: str, year: int, month: int, day: int) -> ValueError:
+def invalid_date_error(token: str, year: int, month: int, day: int) -> ValueError:
     if not 1 <= month <= 12:
         return ValueError(f'invalid date "{token}" — month {month} does not exist')
     days = engine.days_in_month(year, month)
     return ValueError(
         f'invalid date "{token}" — {MONTH_NAMES[month - 1]} {year} '
-        f"has no {day}{_ordinal_suffix(day)} day"
+        f"has no {day}{ordinal_suffix(day)} day"
     )
 
 
@@ -115,8 +115,8 @@ def parse_numeric_date(token: str):
     a, b, c = match.groups()
     if len(a) == 4:
         year, month, day = int(a), int(b), int(c)
-        if not _is_valid_date(year, month, day):
-            raise _invalid_date_error(token, year, month, day)
+        if not is_valid_date(year, month, day):
+            raise invalid_date_error(token, year, month, day)
         return year, month, day
 
     parts = (int(a), int(b), int(c))
@@ -126,14 +126,14 @@ def parse_numeric_date(token: str):
         return values["y"], values["m"], values["d"]
 
     preferred = build(_DAY_MONTH_ORDER)
-    if _is_valid_date(*preferred):
+    if is_valid_date(*preferred):
         return preferred
 
     alternate = build(_ALT_DAY_MONTH_ORDER)
-    if _is_valid_date(*alternate):
+    if is_valid_date(*alternate):
         return alternate
 
-    raise _invalid_date_error(token, *preferred)
+    raise invalid_date_error(token, *preferred)
 
 
 def format_date(year: int, month: int, day: int) -> str:

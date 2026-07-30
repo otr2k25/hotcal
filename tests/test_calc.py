@@ -63,3 +63,55 @@ def test_bare_last_weekday_defers_to_relative_category():
     # "last friday" (no month) must NOT be claimed by the Calculation grammar.
     assert parse_calculation("last friday") is None
     assert parse_calculation("last monday") is None
+
+
+def test_day_of_month_word_ordinal_with_of():
+    expr = parse_calculation("third of march")
+    assert expr == CalcExpr("day_of_month", month=3, day=3, year=None)
+
+
+def test_day_of_month_word_ordinal_first():
+    expr = parse_calculation("first of may")
+    assert expr == CalcExpr("day_of_month", month=5, day=1, year=None)
+
+
+def test_day_of_month_beyond_fifth_word_ordinal():
+    expr = parse_calculation("twenty-second of march")
+    assert expr == CalcExpr("day_of_month", month=3, day=22, year=None)
+
+
+def test_day_of_month_numeral_suffix_with_year():
+    expr = parse_calculation("22nd august 1932")
+    assert expr == CalcExpr("day_of_month", month=8, day=22, year=1932)
+
+
+def test_day_of_month_bare_cardinal_with_year():
+    expr = parse_calculation("15 january 2067")
+    assert expr == CalcExpr("day_of_month", month=1, day=15, year=2067)
+
+
+def test_day_of_month_bare_cardinal_written_word():
+    expr = parse_calculation("fifteen january 2067")
+    assert expr == CalcExpr("day_of_month", month=1, day=15, year=2067)
+
+
+def test_day_of_month_accepts_in_connector_too():
+    expr = parse_calculation("third in march")
+    assert expr == CalcExpr("day_of_month", month=3, day=3, year=None)
+
+
+def test_day_of_month_defers_when_no_month_follows():
+    # These are malformed Relative expressions, not day-of-month ones — must
+    # not be claimed here, so the caller falls back to the Relative parser.
+    assert parse_calculation("5 days ago") is None
+    assert parse_calculation("twenty weeks ago") is None
+    assert parse_calculation("in three weeks") is None
+
+
+def test_day_of_month_rejects_mismatched_ordinal_suffix():
+    # "22nd" is correct, "22th" isn't a recognized token at all.
+    assert parse_calculation("22th august 1932") is None
+
+
+def test_day_of_month_rejects_out_of_range_day():
+    assert parse_calculation("35th of march") is None

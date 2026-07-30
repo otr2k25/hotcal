@@ -49,6 +49,11 @@ def resolve_calc(expr: CalcExpr, today: tuple[int, int, int], original_text: str
         month = expr.month if expr.month is not None else today[1]
         return engine.last_day_of_month(year, month)
 
+    if expr.kind == "day_of_month":
+        if not dateformat.is_valid_date(year, expr.month, expr.day):
+            raise ParseError(str(dateformat.invalid_date_error(original_text, year, expr.month, expr.day)))
+        return (year, expr.month, expr.day)
+
     if expr.kind == "nth_weekday_of_month":
         try:
             return engine.nth_weekday_of_month(year, expr.month, expr.weekday, expr.n)
